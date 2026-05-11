@@ -13,8 +13,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.flashmatch.mobile.util.SoundManager
-import kotlinx.coroutines.delay
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.flashmatch.mobile.navigation.Screen
@@ -24,7 +22,15 @@ import com.flashmatch.mobile.ui.theme.Correct
 import com.flashmatch.mobile.ui.theme.LocalDarkTheme
 import com.flashmatch.mobile.ui.theme.LocalToggleTheme
 import com.flashmatch.mobile.ui.theme.Wrong
+import com.flashmatch.mobile.util.SoundManager
 import com.flashmatch.mobile.viewmodel.QuizViewModel
+import kotlinx.coroutines.delay
+
+private fun formatTime(seconds: Int): String {
+    val m = seconds / 60
+    val s = seconds % 60
+    return "$m:${s.toString().padStart(2, '0')}"
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,7 +59,16 @@ fun QuizScreen(navController: NavController, deckId: String, viewModel: QuizView
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Quiz", fontWeight = FontWeight.SemiBold) },
+                title = {
+                    Column {
+                        Text("Quiz", fontWeight = FontWeight.SemiBold)
+                        Text(
+                            text = formatTime(state.elapsedSeconds),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")

@@ -7,5 +7,7 @@ data class Deck(
     val name: String = "",
     val description: String = "",
     val cardCount: Int = 0,
-    val createdAt: Long = System.currentTimeMillis()
+    val createdAt: Long = System.currentTimeMillis(),
+    val isCompleted: Boolean = false,
+    val bestTime: Long = 0L
 )

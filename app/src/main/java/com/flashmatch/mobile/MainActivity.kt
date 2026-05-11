@@ -1,5 +1,6 @@
 package com.flashmatch.mobile
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -22,7 +23,9 @@ import com.flashmatch.mobile.viewmodel.ThemeViewModel
 class MainActivity : ComponentActivity() {
 
     private val authViewModel: AuthViewModel by viewModels()
-    private val themeViewModel: ThemeViewModel by viewModels()
+    private val themeViewModel: ThemeViewModel by viewModels {
+        ThemeViewModel.factory(getSharedPreferences("flashmatch_prefs", Context.MODE_PRIVATE))
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -9,10 +9,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
-class DeckRepository {
+open class DeckRepository {
 
-    private val firestore = FirebaseFirestore.getInstance()
-    private val auth = FirebaseAuth.getInstance()
+    private val firestore by lazy { FirebaseFirestore.getInstance() }
+    private val auth by lazy { FirebaseAuth.getInstance() }
 
     private val uid: String get() = auth.currentUser?.uid ?: error("User not authenticated")
 
@@ -28,7 +28,7 @@ class DeckRepository {
         awaitClose { listener.remove() }
     }
 
-    suspend fun getDeck(deckId: String): Deck? =
+    open suspend fun getDeck(deckId: String): Deck? =
         decksRef().document(deckId).get().await().toObject(Deck::class.java)
 
     suspend fun createDeck(name: String, description: String): String {
@@ -59,7 +59,7 @@ class DeckRepository {
         awaitClose { listener.remove() }
     }
 
-    suspend fun getCards(deckId: String): List<Card> =
+    open suspend fun getCards(deckId: String): List<Card> =
         cardsRef(deckId).get().await().documents.mapNotNull { it.toObject(Card::class.java) }
 
     suspend fun addCard(deckId: String, front: String, back: String): String {
@@ -79,11 +79,17 @@ class DeckRepository {
         refreshCardCount(deckId)
     }
 
-    suspend fun batchUpdateCards(deckId: String, cards: List<Card>) {
+    open suspend fun batchUpdateCards(deckId: String, cards: List<Card>) {
         if (cards.isEmpty()) return
         val batch = firestore.batch()
         cards.forEach { card -> batch.set(cardsRef(deckId).document(card.id), card) }
         batch.commit().await()
+    }
+
+    open suspend fun updateDeckStats(deckId: String, elapsedSeconds: Long, isNewRecord: Boolean) {
+        val updates = mutableMapOf<String, Any>("isCompleted" to true)
+        if (isNewRecord) updates["bestTime"] = elapsedSeconds
+        decksRef().document(deckId).update(updates).await()
     }
 
     private suspend fun refreshCardCount(deckId: String) {

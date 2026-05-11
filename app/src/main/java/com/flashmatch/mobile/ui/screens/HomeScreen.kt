@@ -6,6 +6,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Style
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -18,6 +20,8 @@ import androidx.navigation.NavController
 import com.flashmatch.mobile.auth.AuthViewModel
 import com.flashmatch.mobile.navigation.Screen
 import com.flashmatch.mobile.ui.components.DeckCard
+import com.flashmatch.mobile.ui.theme.LocalDarkTheme
+import com.flashmatch.mobile.ui.theme.LocalToggleTheme
 import com.flashmatch.mobile.viewmodel.HomeViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -31,6 +35,8 @@ fun HomeScreen(
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val user by authViewModel.user.collectAsStateWithLifecycle()
     var showSignOutDialog by remember { mutableStateOf(false) }
+    val isDark = LocalDarkTheme.current
+    val toggleTheme = LocalToggleTheme.current
 
     LaunchedEffect(user) {
         if (user == null) {
@@ -68,6 +74,13 @@ fun HomeScreen(
                     )
                 },
                 actions = {
+                    IconButton(onClick = toggleTheme) {
+                        Icon(
+                            imageVector = if (isDark) Icons.Default.LightMode else Icons.Default.DarkMode,
+                            contentDescription = "Toggle theme",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                     IconButton(onClick = { showSignOutDialog = true }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.Logout,

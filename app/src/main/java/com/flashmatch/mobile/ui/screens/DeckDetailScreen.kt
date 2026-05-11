@@ -9,8 +9,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -24,6 +26,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.flashmatch.mobile.data.model.Card
 import com.flashmatch.mobile.navigation.Screen
+import com.flashmatch.mobile.ui.theme.LocalDarkTheme
+import com.flashmatch.mobile.ui.theme.LocalToggleTheme
 import com.flashmatch.mobile.viewmodel.DeckDetailViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -38,6 +42,8 @@ fun DeckDetailScreen(
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val deleted by viewModel.deleted.collectAsStateWithLifecycle()
     var showDeleteDialog by remember { mutableStateOf(false) }
+    val isDark = LocalDarkTheme.current
+    val toggleTheme = LocalToggleTheme.current
 
     LaunchedEffect(deckId) { viewModel.load(deckId) }
 
@@ -74,6 +80,13 @@ fun DeckDetailScreen(
                     }
                 },
                 actions = {
+                    IconButton(onClick = toggleTheme) {
+                        Icon(
+                            imageVector = if (isDark) Icons.Default.LightMode else Icons.Default.DarkMode,
+                            contentDescription = "Toggle theme",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                     IconButton(onClick = { navController.navigate(Screen.EditDeck.createRoute(deckId)) }) {
                         Icon(Icons.Default.Edit, "Edit", tint = MaterialTheme.colorScheme.onSurfaceVariant)
                     }

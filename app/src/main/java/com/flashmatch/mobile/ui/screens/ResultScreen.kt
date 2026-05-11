@@ -5,8 +5,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -19,6 +21,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.flashmatch.mobile.navigation.Screen
 import com.flashmatch.mobile.ui.theme.Correct
+import com.flashmatch.mobile.ui.theme.LocalDarkTheme
+import com.flashmatch.mobile.ui.theme.LocalToggleTheme
 import com.flashmatch.mobile.ui.theme.Wrong
 import com.flashmatch.mobile.viewmodel.QuizSessionCache
 import kotlin.math.roundToInt
@@ -28,6 +32,8 @@ fun ResultScreen(navController: NavController, deckId: String, accuracy: Float) 
     val hardestCards = QuizSessionCache.hardestCards
     val pct = (accuracy * 100).roundToInt()
     val accentColor = if (pct >= 70) Correct else if (pct >= 40) MaterialTheme.colorScheme.primary else Wrong
+    val isDark = LocalDarkTheme.current
+    val toggleTheme = LocalToggleTheme.current
 
     LazyColumn(
         modifier = Modifier
@@ -37,6 +43,15 @@ fun ResultScreen(navController: NavController, deckId: String, accuracy: Float) 
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         item {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                IconButton(onClick = toggleTheme) {
+                    Icon(
+                        imageVector = if (isDark) Icons.Default.LightMode else Icons.Default.DarkMode,
+                        contentDescription = "Toggle theme",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
             Surface(
                 shape = MaterialTheme.shapes.extraLarge,
                 color = accentColor.copy(alpha = 0.15f),

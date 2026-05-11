@@ -5,6 +5,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -17,6 +19,8 @@ import com.flashmatch.mobile.navigation.Screen
 import com.flashmatch.mobile.ui.components.FlashCard
 import com.flashmatch.mobile.ui.components.QuizProgressBar
 import com.flashmatch.mobile.ui.theme.Correct
+import com.flashmatch.mobile.ui.theme.LocalDarkTheme
+import com.flashmatch.mobile.ui.theme.LocalToggleTheme
 import com.flashmatch.mobile.ui.theme.Wrong
 import com.flashmatch.mobile.viewmodel.QuizViewModel
 
@@ -24,6 +28,8 @@ import com.flashmatch.mobile.viewmodel.QuizViewModel
 @Composable
 fun QuizScreen(navController: NavController, deckId: String, viewModel: QuizViewModel) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val isDark = LocalDarkTheme.current
+    val toggleTheme = LocalToggleTheme.current
 
     LaunchedEffect(deckId) { viewModel.loadSession(deckId) }
 
@@ -44,6 +50,15 @@ fun QuizScreen(navController: NavController, deckId: String, viewModel: QuizView
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
+                    }
+                },
+                actions = {
+                    IconButton(onClick = toggleTheme) {
+                        Icon(
+                            imageVector = if (isDark) Icons.Default.LightMode else Icons.Default.DarkMode,
+                            contentDescription = "Toggle theme",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)

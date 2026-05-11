@@ -7,6 +7,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -17,6 +19,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.flashmatch.mobile.data.model.Card
+import com.flashmatch.mobile.ui.theme.LocalDarkTheme
+import com.flashmatch.mobile.ui.theme.LocalToggleTheme
 import com.flashmatch.mobile.viewmodel.CardDraft
 import com.flashmatch.mobile.viewmodel.CreateDeckViewModel
 import com.flashmatch.mobile.viewmodel.DeckDetailViewModel
@@ -43,6 +47,8 @@ fun EditDeckScreen(
     var newCards by remember { mutableStateOf<List<CardDraft>>(emptyList()) }
     var deletedCardIds by remember { mutableStateOf<Set<String>>(emptySet()) }
     var initialized by remember { mutableStateOf(false) }
+    val isDark = LocalDarkTheme.current
+    val toggleTheme = LocalToggleTheme.current
 
     LaunchedEffect(deckId) { loadViewModel.load(deckId) }
 
@@ -71,6 +77,13 @@ fun EditDeckScreen(
                     }
                 },
                 actions = {
+                    IconButton(onClick = toggleTheme) {
+                        Icon(
+                            imageVector = if (isDark) Icons.Default.LightMode else Icons.Default.DarkMode,
+                            contentDescription = "Toggle theme",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                     TextButton(
                         onClick = {
                             saveViewModel.updateDeck(

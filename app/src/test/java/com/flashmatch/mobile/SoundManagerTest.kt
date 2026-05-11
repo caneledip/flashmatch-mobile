@@ -12,7 +12,7 @@ import org.junit.Test
  */
 class SoundManagerTest {
 
-    private fun sm() = SoundManager(toneGen = null)
+    private fun sm() = SoundManager(context = null)
 
     @Test fun instantiation_doesNotThrow() { sm() }
 

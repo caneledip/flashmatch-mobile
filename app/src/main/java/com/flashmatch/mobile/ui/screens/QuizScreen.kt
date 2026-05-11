@@ -39,7 +39,8 @@ fun QuizScreen(navController: NavController, deckId: String, viewModel: QuizView
     val isDark = LocalDarkTheme.current
     val toggleTheme = LocalToggleTheme.current
 
-    val soundManager = remember { SoundManager() }
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val soundManager = remember { SoundManager(context) }
     DisposableEffect(Unit) { onDispose { soundManager.release() } }
 
     LaunchedEffect(deckId) { viewModel.loadSession(deckId) }

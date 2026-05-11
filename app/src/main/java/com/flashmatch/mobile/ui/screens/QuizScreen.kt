@@ -13,6 +13,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.flashmatch.mobile.util.SoundManager
+import kotlinx.coroutines.delay
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.flashmatch.mobile.navigation.Screen
@@ -31,10 +33,15 @@ fun QuizScreen(navController: NavController, deckId: String, viewModel: QuizView
     val isDark = LocalDarkTheme.current
     val toggleTheme = LocalToggleTheme.current
 
+    val soundManager = remember { SoundManager() }
+    DisposableEffect(Unit) { onDispose { soundManager.release() } }
+
     LaunchedEffect(deckId) { viewModel.loadSession(deckId) }
 
     LaunchedEffect(state.isComplete) {
         if (state.isComplete) {
+            soundManager.playComplete()
+            delay(450L)
             val accuracy = if (state.totalTaps == 0) 0f
                            else state.correctTaps.toFloat() / state.totalTaps
             navController.navigate(Screen.Result.createRoute(deckId, accuracy)) {
@@ -108,7 +115,10 @@ fun QuizScreen(navController: NavController, deckId: String, viewModel: QuizView
                         FlashCard(
                             card = card,
                             isFlipped = state.isFlipped,
-                            onFlip = { viewModel.flip() },
+                            onFlip = {
+                                soundManager.playFlip()
+                                viewModel.flip()
+                            },
                             modifier = Modifier.fillMaxWidth()
                         )
 
@@ -118,7 +128,10 @@ fun QuizScreen(navController: NavController, deckId: String, viewModel: QuizView
                                 horizontalArrangement = Arrangement.spacedBy(12.dp)
                             ) {
                                 Button(
-                                    onClick = { viewModel.markWrong() },
+                                    onClick = {
+                                        soundManager.playWrong()
+                                        viewModel.markWrong()
+                                    },
                                     modifier = Modifier.weight(1f).height(52.dp),
                                     colors = ButtonDefaults.buttonColors(containerColor = Wrong),
                                     shape = MaterialTheme.shapes.medium
@@ -128,7 +141,10 @@ fun QuizScreen(navController: NavController, deckId: String, viewModel: QuizView
                                     Text("Wrong", fontWeight = FontWeight.SemiBold)
                                 }
                                 Button(
-                                    onClick = { viewModel.markCorrect(deckId) },
+                                    onClick = {
+                                        soundManager.playCorrect()
+                                        viewModel.markCorrect(deckId)
+                                    },
                                     modifier = Modifier.weight(1f).height(52.dp),
                                     colors = ButtonDefaults.buttonColors(containerColor = Correct),
                                     shape = MaterialTheme.shapes.medium
@@ -140,7 +156,10 @@ fun QuizScreen(navController: NavController, deckId: String, viewModel: QuizView
                             }
                         } else {
                             Button(
-                                onClick = { viewModel.flip() },
+                                onClick = {
+                                    soundManager.playFlip()
+                                    viewModel.flip()
+                                },
                                 modifier = Modifier.fillMaxWidth().height(52.dp),
                                 shape = MaterialTheme.shapes.medium
                             ) {

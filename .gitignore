@@ -19,3 +19,8 @@ CLAUDE.md
 claude.md
 .claudeignore
 FLASHMATCH_CONTEXT.md
+serviceAccountKey.json
+seed_data.js
+node_modules/
+package-lock.json
+package.json

@@ -2,10 +2,10 @@ package com.flashmatch.mobile.ui.screens
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.LightMode
@@ -13,6 +13,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -20,6 +23,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
+import com.flashmatch.mobile.R
 import com.flashmatch.mobile.auth.AuthViewModel
 import com.flashmatch.mobile.navigation.Screen
 import com.flashmatch.mobile.ui.theme.LocalDarkTheme
@@ -32,6 +36,7 @@ fun LoginScreen(navController: NavController, authViewModel: AuthViewModel) {
     val error by authViewModel.error.collectAsStateWithLifecycle()
     val isDark = LocalDarkTheme.current
     val toggleTheme = LocalToggleTheme.current
+    val context = LocalContext.current
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
@@ -101,12 +106,11 @@ fun LoginScreen(navController: NavController, authViewModel: AuthViewModel) {
                 textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.height(56.dp))
+
             Button(
                 onClick = { launcher.launch(authViewModel.getSignInIntent()) },
                 enabled = !isLoading,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp),
+                modifier = Modifier.fillMaxWidth().height(52.dp),
                 shape = MaterialTheme.shapes.medium
             ) {
                 if (isLoading) {
@@ -116,18 +120,49 @@ fun LoginScreen(navController: NavController, authViewModel: AuthViewModel) {
                         color = MaterialTheme.colorScheme.onPrimary
                     )
                 } else {
-                    Icon(
-                        imageVector = Icons.Default.AccountCircle,
+                    Image(
+                        painter = painterResource(R.drawable.ic_google),
                         contentDescription = null,
                         modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(10.dp))
-                    Text(
-                        text = "Sign in with Google",
-                        style = MaterialTheme.typography.labelLarge
-                    )
+                    Text("Sign in with Google", style = MaterialTheme.typography.labelLarge)
                 }
             }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                HorizontalDivider(modifier = Modifier.weight(1f))
+                Text(
+                    text = "  or  ",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                HorizontalDivider(modifier = Modifier.weight(1f))
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            OutlinedButton(
+                onClick = { authViewModel.signInWithGitHub(context as android.app.Activity) },
+                enabled = !isLoading,
+                modifier = Modifier.fillMaxWidth().height(52.dp),
+                shape = MaterialTheme.shapes.medium
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.ic_github),
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp),
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface)
+                )
+                Spacer(modifier = Modifier.width(10.dp))
+                Text("Sign in with GitHub", style = MaterialTheme.typography.labelLarge)
+            }
+
             if (error != null) {
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(

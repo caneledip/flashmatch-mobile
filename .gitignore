@@ -13,3 +13,8 @@
 .externalNativeBuild
 .cxx
 local.properties
+FLASHMATCH_MOBILE_BRIEF.md
+.claude/
+CLAUDE.md
+claude.md
+.claudeignore

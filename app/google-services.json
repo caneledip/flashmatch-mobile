@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "710352557564",
+    "project_id": "flashmatch-mobile",
+    "storage_bucket": "flashmatch-mobile.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:710352557564:android:ffa482e9a06437df364e79",
+        "android_client_info": {
+          "package_name": "com.flashmatch.mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC2s3MLx1cFpaRpgNmka7t3bOnFzdA0RK0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

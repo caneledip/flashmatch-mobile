@@ -19,6 +19,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.flashmatch.mobile.data.model.Card
+import com.flashmatch.mobile.ui.components.DeckColorPicker
+import com.flashmatch.mobile.ui.components.deckSwatches
 import com.flashmatch.mobile.ui.theme.LocalDarkTheme
 import com.flashmatch.mobile.ui.theme.LocalToggleTheme
 import com.flashmatch.mobile.viewmodel.CardDraft
@@ -43,6 +45,7 @@ fun EditDeckScreen(
 
     var deckName by remember { mutableStateOf("") }
     var deckDesc by remember { mutableStateOf("") }
+    var deckColor by remember { mutableStateOf(deckSwatches.first()) }
     var existingCards by remember { mutableStateOf<List<Card>>(emptyList()) }
     var newCards by remember { mutableStateOf<List<CardDraft>>(emptyList()) }
     var deletedCardIds by remember { mutableStateOf<Set<String>>(emptySet()) }
@@ -56,6 +59,7 @@ fun EditDeckScreen(
         if (!isLoading && !initialized && deck != null) {
             deckName = deck!!.name
             deckDesc = deck!!.description
+            deckColor = deck!!.color.ifEmpty { deckSwatches.first() }
             existingCards = loadedCards
             initialized = true
         }
@@ -90,6 +94,7 @@ fun EditDeckScreen(
                                 deckId = deckId,
                                 name = deckName,
                                 description = deckDesc,
+                                color = deckColor,
                                 updatedExisting = existingCards,
                                 newCards = newCards,
                                 deletedCardIds = deletedCardIds
@@ -139,6 +144,9 @@ fun EditDeckScreen(
                     modifier = Modifier.fillMaxWidth(),
                     maxLines = 2
                 )
+            }
+            item {
+                DeckColorPicker(selected = deckColor, onSelect = { deckColor = it })
             }
             if (existingCards.isNotEmpty()) {
                 item {

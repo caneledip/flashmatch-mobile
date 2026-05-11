@@ -20,6 +20,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.flashmatch.mobile.navigation.Screen
+import com.flashmatch.mobile.ui.components.DeckColorPicker
+import com.flashmatch.mobile.ui.components.deckSwatches
 import com.flashmatch.mobile.ui.theme.LocalDarkTheme
 import com.flashmatch.mobile.ui.theme.LocalToggleTheme
 import com.flashmatch.mobile.viewmodel.CardDraft
@@ -31,6 +33,7 @@ import java.util.UUID
 fun CreateDeckScreen(navController: NavController, viewModel: CreateDeckViewModel) {
     var deckName by remember { mutableStateOf("") }
     var deckDesc by remember { mutableStateOf("") }
+    var deckColor by remember { mutableStateOf(deckSwatches.first()) }
     var cards by remember { mutableStateOf(listOf(CardDraft(id = UUID.randomUUID().toString()))) }
 
     val isSaving by viewModel.isSaving.collectAsStateWithLifecycle()
@@ -65,7 +68,7 @@ fun CreateDeckScreen(navController: NavController, viewModel: CreateDeckViewMode
                         )
                     }
                     TextButton(
-                        onClick = { viewModel.createDeck(deckName, deckDesc, cards) },
+                        onClick = { viewModel.createDeck(deckName, deckDesc, deckColor, cards) },
                         enabled = !isSaving
                     ) {
                         if (isSaving) {
@@ -107,6 +110,9 @@ fun CreateDeckScreen(navController: NavController, viewModel: CreateDeckViewMode
                     maxLines = 2,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
                 )
+            }
+            item {
+                DeckColorPicker(selected = deckColor, onSelect = { deckColor = it })
             }
             item {
                 Row(

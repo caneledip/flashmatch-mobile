@@ -26,12 +26,12 @@ class CreateDeckViewModel(private val repository: DeckRepository) : ViewModel() 
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
 
-    fun createDeck(name: String, description: String, newCards: List<CardDraft>) {
+    fun createDeck(name: String, description: String, color: String, newCards: List<CardDraft>) {
         if (name.isBlank()) { _error.value = "Deck name cannot be empty"; return }
         viewModelScope.launch {
             _isSaving.value = true
             try {
-                val deckId = repository.createDeck(name, description)
+                val deckId = repository.createDeck(name, description, color)
                 newCards.filter { it.front.isNotBlank() }.forEach {
                     repository.addCard(deckId, it.front, it.back)
                 }
@@ -48,6 +48,7 @@ class CreateDeckViewModel(private val repository: DeckRepository) : ViewModel() 
         deckId: String,
         name: String,
         description: String,
+        color: String,
         updatedExisting: List<Card>,
         newCards: List<CardDraft>,
         deletedCardIds: Set<String>
@@ -58,7 +59,7 @@ class CreateDeckViewModel(private val repository: DeckRepository) : ViewModel() 
             try {
                 val existing = repository.getDeck(deckId)
                     ?: throw Exception("Deck not found")
-                repository.updateDeck(existing.copy(name = name, description = description))
+                repository.updateDeck(existing.copy(name = name, description = description, color = color))
                 deletedCardIds.forEach { repository.deleteCard(deckId, it) }
                 updatedExisting.forEach { repository.updateCard(deckId, it) }
                 newCards.filter { it.front.isNotBlank() }.forEach {

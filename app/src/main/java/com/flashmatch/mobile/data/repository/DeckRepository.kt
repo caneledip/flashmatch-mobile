@@ -31,9 +31,9 @@ open class DeckRepository {
     open suspend fun getDeck(deckId: String): Deck? =
         decksRef().document(deckId).get().await().toObject(Deck::class.java)
 
-    suspend fun createDeck(name: String, description: String): String {
+    suspend fun createDeck(name: String, description: String, color: String): String {
         val ref = decksRef().document()
-        val deck = Deck(id = ref.id, name = name, description = description)
+        val deck = Deck(id = ref.id, name = name, description = description, color = color)
         ref.set(deck).await()
         return ref.id
     }

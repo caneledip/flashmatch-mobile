@@ -8,8 +8,10 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Style
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.flashmatch.mobile.data.model.Deck
@@ -23,6 +25,13 @@ private fun formatTime(seconds: Long): String {
 
 @Composable
 fun DeckCard(deck: Deck, onClick: () -> Unit) {
+    val iconColor: Color? = remember(deck.color) {
+        if (deck.color.isNotEmpty()) {
+            try { Color(android.graphics.Color.parseColor(deck.color)) }
+            catch (_: Exception) { null }
+        } else null
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -53,16 +62,17 @@ fun DeckCard(deck: Deck, onClick: () -> Unit) {
                     }
                 }
             ) {
+                val effectiveColor = iconColor ?: MaterialTheme.colorScheme.primary
                 Surface(
                     shape = MaterialTheme.shapes.small,
-                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
+                    color = effectiveColor.copy(alpha = 0.15f),
                     modifier = Modifier.size(44.dp)
                 ) {
                     Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
                         Icon(
                             imageVector = Icons.Default.Style,
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
+                            tint = effectiveColor,
                             modifier = Modifier.size(22.dp)
                         )
                     }

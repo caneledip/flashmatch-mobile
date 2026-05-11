@@ -9,5 +9,6 @@ data class Deck(
     val cardCount: Int = 0,
     val createdAt: Long = System.currentTimeMillis(),
     val isCompleted: Boolean = false,
-    val bestTime: Long = 0L
+    val bestTime: Long = 0L,
+    val color: String = ""
 )

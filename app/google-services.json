@@ -12,7 +12,20 @@
           "package_name": "com.flashmatch.mobile"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "710352557564-88vd7mecd519sb0mk9mf9ic3jlti46dp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.flashmatch.mobile",
+            "certificate_hash": "1e50327d2ab4ff63a4e9dc3f98c26f33512b6e17"
+          }
+        },
+        {
+          "client_id": "710352557564-cv6ht4ek7cfos440v70s31cbuf0dqsav.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyC2s3MLx1cFpaRpgNmka7t3bOnFzdA0RK0"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "710352557564-cv6ht4ek7cfos440v70s31cbuf0dqsav.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

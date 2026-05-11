@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">FlashMatch</string>
+    <!-- Overridden by google-services plugin once Google Sign-In is enabled in Firebase Console -->
+    <string name="default_web_client_id" translatable="false"></string>
 </resources>

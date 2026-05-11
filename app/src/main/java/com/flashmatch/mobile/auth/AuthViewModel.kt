@@ -30,11 +30,13 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     val error: StateFlow<String?> = _error
 
     init {
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(application.getString(com.flashmatch.mobile.R.string.default_web_client_id))
+        val clientId = application.getString(com.flashmatch.mobile.R.string.default_web_client_id)
+        val gsoBuilder = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestEmail()
-            .build()
-        googleSignInClient = GoogleSignIn.getClient(application, gso)
+        if (clientId.isNotBlank()) {
+            gsoBuilder.requestIdToken(clientId)
+        }
+        googleSignInClient = GoogleSignIn.getClient(application, gsoBuilder.build())
     }
 
     fun getSignInIntent() = googleSignInClient.signInIntent

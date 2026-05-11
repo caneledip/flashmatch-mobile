@@ -8,7 +8,6 @@ import com.flashmatch.mobile.data.repository.DeckRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlin.random.Random
 
 data class QuizState(
     val currentCard: Card? = null,
@@ -29,24 +28,19 @@ object QuizSessionCache {
 
 class QuizViewModel(private val repository: DeckRepository) : ViewModel() {
 
+    private val engine = QuizEngine()
+
     private val _state = MutableStateFlow(QuizState())
     val state: StateFlow<QuizState> = _state
-
-    private val sessionCards: MutableList<Card> = mutableListOf()
-    private val clearedIds: MutableSet<String> = mutableSetOf()
-    private val retryMap: MutableMap<String, Int> = mutableMapOf()
 
     fun loadSession(deckId: String) {
         viewModelScope.launch {
             _state.value = QuizState(isLoading = true)
             try {
                 val cards = repository.getCards(deckId)
-                sessionCards.clear()
-                sessionCards.addAll(cards)
-                clearedIds.clear()
-                retryMap.clear()
-                _state.value = QuizState(totalCards = cards.size, isLoading = false)
-                pickNext()
+                engine.startSession(cards)
+                _state.value = QuizState(totalCards = engine.total, isLoading = false)
+                advanceCard()
             } catch (e: Exception) {
                 _state.value = QuizState(isLoading = false, error = e.message)
             }
@@ -59,76 +53,47 @@ class QuizViewModel(private val repository: DeckRepository) : ViewModel() {
 
     fun markCorrect(deckId: String) {
         val card = _state.value.currentCard ?: return
-        applyResult(card, correct = true)
-        clearedIds.add(card.id)
+        engine.markCorrect(card)
         val correctTaps = _state.value.correctTaps + 1
         val totalTaps = _state.value.totalTaps + 1
-        if (clearedIds.size == sessionCards.size) {
+        if (engine.isComplete) {
             finishSession(deckId, correctTaps, totalTaps)
         } else {
             _state.value = _state.value.copy(
-                clearedCount = clearedIds.size,
+                clearedCount = engine.cleared,
                 correctTaps = correctTaps,
                 totalTaps = totalTaps,
                 isFlipped = false
             )
-            pickNext()
+            advanceCard()
         }
     }
 
     fun markWrong() {
         val card = _state.value.currentCard ?: return
-        applyResult(card, correct = false)
-        retryMap[card.id] = (retryMap[card.id] ?: 0) + 1
+        engine.markWrong(card)
         _state.value = _state.value.copy(totalTaps = _state.value.totalTaps + 1, isFlipped = false)
-        pickNext()
+        advanceCard()
     }
 
-    private fun applyResult(card: Card, correct: Boolean) {
-        val idx = sessionCards.indexOfFirst { it.id == card.id }
-        if (idx == -1) return
-        val updated = if (correct) {
-            val nc = card.correctCount + 1
-            card.copy(correctCount = nc, correctnessScore = nc.toFloat() / (nc + card.incorrectCount))
-        } else {
-            val ni = card.incorrectCount + 1
-            card.copy(incorrectCount = ni, correctnessScore = card.correctCount.toFloat() / (card.correctCount + ni))
-        }
-        sessionCards[idx] = updated
-    }
-
-    private fun pickNext() {
-        val available = sessionCards.filter { it.id !in clearedIds }
-        if (available.isEmpty()) return
-        val weights = available.map { (1f - it.correctnessScore).coerceAtLeast(0.01f) }
-        val total = weights.sum()
-        val r = Random.nextFloat() * total
-        var cumulative = 0f
-        var picked = available.last()
-        for (i in available.indices) {
-            cumulative += weights[i]
-            if (r <= cumulative) { picked = available[i]; break }
-        }
-        _state.value = _state.value.copy(currentCard = picked)
+    private fun advanceCard() {
+        _state.value = _state.value.copy(currentCard = engine.pickNext())
     }
 
     private fun finishSession(deckId: String, correctTaps: Int, totalTaps: Int) {
         val accuracy = if (totalTaps == 0) 0f else correctTaps.toFloat() / totalTaps
         QuizSessionCache.accuracy = accuracy
-        QuizSessionCache.hardestCards = retryMap.entries
-            .sortedByDescending { it.value }
-            .take(5)
-            .mapNotNull { (id, _) -> sessionCards.find { it.id == id } }
+        QuizSessionCache.hardestCards = engine.getHardestCards()
 
         _state.value = _state.value.copy(
-            clearedCount = sessionCards.size,
+            clearedCount = engine.total,
             correctTaps = correctTaps,
             totalTaps = totalTaps,
             isComplete = true,
             isFlipped = false
         )
         viewModelScope.launch {
-            try { repository.batchUpdateCards(deckId, sessionCards) } catch (_: Exception) {}
+            try { repository.batchUpdateCards(deckId, engine.getSessionCards()) } catch (_: Exception) {}
         }
     }
 
